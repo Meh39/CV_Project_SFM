@@ -1,7 +1,7 @@
 # sfm_pipeline.py
 from helper_functions import (load_coil_images, preprocess_image, draw_3d_point_cloud,
-                              triangulate_pair, filter_point_cloud, interpolate_points)#,
-                              #get_camera_pose)
+                              triangulate_pair, filter_point_cloud, interpolate_points,
+                              get_camera_pose)
 import cv2
 import numpy as np
 import glob
