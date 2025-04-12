@@ -16,9 +16,9 @@ st.write("Select an object and run the SfM pipeline to view its 3D reconstructio
 object_choice = st.selectbox("Select Object", ["Object 21", "Object 31"])
 
 if object_choice == "Object 21":
-    coil_pattern = "coil-100/coil-100/obj21__*.png"
+    coil_pattern = "object21/obj21__*.png"
 else:
-    coil_pattern = "coil-100/coil-100/obj31__*.png"
+    coil_pattern = "object31/obj31__*.png"
 
 # Display a sample image from the chosen object for verification.
 sample_paths = sorted(glob.glob(coil_pattern))
