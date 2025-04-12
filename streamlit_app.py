@@ -19,8 +19,15 @@ if object_choice == "Object 21":
 else:
     coil_pattern = "coil-100/coil-100/obj31__*.png"
 
+# Display a sample image from the chosen object for verification.
+sample_paths = sorted(glob.glob(coil_pattern))
+if sample_paths:
+    sample_img = cv2.imread(sample_paths[0])
+    if sample_img is not None:
+        st.image(cv2.cvtColor(sample_img, cv2.COLOR_BGR2RGB), caption=f"Sample image from {object_choice}", use_column_width=True)
+
 if st.button("Run SfM Pipeline"):
-    st.write("Running SfM pipeline. This may take a few moments…")
+    st.write("Running SfM pipeline. This may take several minutes…")
     point_cloud, global_R, global_t, used_frame_indices = run_sfm_pipeline(
         coil_pattern,
         use_orb=True,         # Switch to False to use SIFT features
@@ -28,7 +35,7 @@ if st.button("Run SfM Pipeline"):
         filter_outliers=True
     )
     st.write(f"SfM pipeline completed. Total 3D points reconstructed: {point_cloud.shape[0]}")
-
+    
     # Visualize the 3D point cloud using Matplotlib
     fig = plt.figure(figsize=(8,6))
     ax = fig.add_subplot(111, projection="3d")
@@ -40,7 +47,7 @@ if st.button("Run SfM Pipeline"):
     buffer = io.BytesIO()
     np.save(buffer, point_cloud)
     buffer.seek(0)
-    st.download_button(label="Download Point Cloud",
+    st.download_button(label="Download Point Cloud (.npy)",
                        data=buffer,
                        file_name="point_cloud.npy",
                        mime="application/octet-stream")
