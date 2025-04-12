@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import io
 from sfm_pipeline import run_sfm_pipeline
+import glob
 
 # Suppress deprecation warnings for pyplot
 st.set_option('deprecation.showPyplotGlobalUse', False)
