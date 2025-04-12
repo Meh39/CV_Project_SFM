@@ -1,4 +1,3 @@
-# main.py
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,12 +21,12 @@ coil_pattern = "coil-100/coil-100/obj21__*.png"
 # Run the SfM pipeline
 point_cloud, global_R, global_t, used_frame_indices = run_sfm_pipeline(
     coil_pattern,
-    use_orb=True,         # Set True to use ORB features
-    interpolate_flag=True,
-    filter_flag=True
+    use_orb=True,         # Set True to use ORB features; set False to use SIFT features
+    interpolate=True,
+    filter_outliers=True
 )
 
-# Save the results
+# Save the results locally
 np.save("point_cloud.npy", point_cloud)
 np.save("camera_rotations.npy", np.array(global_R))
 np.save("camera_translations.npy", np.array(global_t))

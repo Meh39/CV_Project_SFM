@@ -1,0 +1,46 @@
+import streamlit as st
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+import io
+from sfm_pipeline import run_sfm_pipeline
+
+# Suppress deprecation warnings for pyplot
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
+st.title("COIL-100 Structure-from-Motion Viewer")
+st.write("Select an object and run the SfM pipeline to view its 3D reconstruction.")
+
+# Provide a selection box for two example objects.
+object_choice = st.selectbox("Select Object", ["Object 21", "Object 31"])
+
+if object_choice == "Object 21":
+    coil_pattern = "coil-100/coil-100/obj21__*.png"
+else:
+    coil_pattern = "coil-100/coil-100/obj31__*.png"
+
+if st.button("Run SfM Pipeline"):
+    st.write("Running SfM pipeline. This may take a few moments…")
+    point_cloud, global_R, global_t, used_frame_indices = run_sfm_pipeline(
+        coil_pattern,
+        use_orb=True,         # Switch to False to use SIFT features
+        interpolate=True,
+        filter_outliers=True
+    )
+    st.write(f"SfM pipeline completed. Total 3D points reconstructed: {point_cloud.shape[0]}")
+
+    # Visualize the 3D point cloud using Matplotlib
+    fig = plt.figure(figsize=(8,6))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(point_cloud[:,0], point_cloud[:,1], point_cloud[:,2], s=2, c="r", alpha=0.8)
+    ax.set_title("3D Reconstruction")
+    st.pyplot(fig)
+    
+    # Prepare the point cloud file for download (as .npy)
+    buffer = io.BytesIO()
+    np.save(buffer, point_cloud)
+    buffer.seek(0)
+    st.download_button(label="Download Point Cloud",
+                       data=buffer,
+                       file_name="point_cloud.npy",
+                       mime="application/octet-stream")
