@@ -12,7 +12,7 @@ from skimage import measure  # For marching cubes
 def load_coil_images(image_pattern):
     """
     Loads and sorts all images matching the given glob pattern.
-    For example: "coil-100/coil-100/obj21__*.png" for object 21.
+    For example: "object21/obj21__*.png" for object 21.
     """
     image_paths = sorted(glob.glob(image_pattern))
     images = []
