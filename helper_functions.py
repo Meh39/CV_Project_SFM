@@ -56,6 +56,53 @@ def preprocess_image(img):
     
     return result
 
+def get_camera_pose(frame_idx, total_images=72, radius=1.0):
+    """
+    Calculate camera pose for turntable setup.
+    
+    Args:
+        frame_idx: Index of the current frame (0 to total_images-1)
+        total_images: Total number of images in a full 360° rotation
+        radius: Distance from camera to object center
+        
+    Returns:
+        R: 3x3 rotation matrix
+        t: 3x1 translation vector
+    """
+    # Calculate angle in radians
+    theta = 2 * np.pi * frame_idx / total_images
+    
+    # Camera position in world coordinates
+    cam_pos = np.array([
+        radius * np.cos(theta),
+        0,
+        radius * np.sin(theta)
+    ])
+    
+    # Look-at point (origin)
+    look_at = np.array([0, 0, 0])
+    
+    # Up vector
+    up = np.array([0, 1, 0])
+    
+    # Calculate camera axes
+    z_axis = look_at - cam_pos
+    z_axis = z_axis / np.linalg.norm(z_axis)
+    
+    x_axis = np.cross(up, z_axis)
+    x_axis = x_axis / np.linalg.norm(x_axis)
+    
+    y_axis = np.cross(z_axis, x_axis)
+    
+    # Rotation matrix (world to camera)
+    R = np.vstack((x_axis, y_axis, z_axis)).T
+    
+    # Translation vector
+    t = -R @ cam_pos.reshape(3, 1)
+    
+    return R, t
+
+
 def draw_3d_point_cloud(points, title="3D Point Cloud", point_size=1, color='b'):
     """
     Visualize 3D points using Matplotlib.
