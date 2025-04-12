@@ -1,5 +1,4 @@
 opencv-python-headless
-glob
 numpy
 matplotlib
 scikit-learn
