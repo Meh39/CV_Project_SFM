@@ -1,5 +1,5 @@
 # Structure from Motion (SfM) on COIL-100 Dataset  
-##Overview  
+Overview  
 This repository contains an implementation of a Structure from Motion (SfM) pipeline for 3D reconstruction of objects from the COIL-100 dataset. The pipeline combines classical computer vision techniques with knowledge of the turntable geometry to create sparse 3D point clouds from multiple 2D views of an object.
   
 Camera Pose Estimation: Initializes camera poses using known turntable geometry and refines them through feature matching
@@ -76,12 +76,9 @@ Reconstruction quality depends on the object's characteristics and lighting cond
 The current implementation produces sparse point clouds rather than dense meshes
 
 Future Work
-Implement bundle adjustment for global optimization
-
-Add dense multi-view stereo for more complete reconstructions
-
-Create mesh representations using surface reconstruction algorithms
-
+Implement bundle adjustment for global optimization  
+Add dense multi-view stereo for more complete reconstructions  
+Create mesh representations using surface reconstruction algorithms  
 Improve feature matching for low-texture objects
 
 License
