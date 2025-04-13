@@ -7,11 +7,6 @@ import numpy as np
 import glob
 
 def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_flag=True):
-    """
-    Run the complete SfM pipeline with improved feature detection and post-processing on COIL-100 images.
-    Uses known turntable geometry for camera pose estimation.
-    """
-    # 1. Load the images matching the pattern
     images = load_coil_images(coil_pattern)
     print(f"Loaded {len(images)} images matching pattern {coil_pattern}")
     if len(images) < 2:
@@ -19,7 +14,6 @@ def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_f
         
     total_imgs = len(images)
     
-    # Display the first image for verification
     import matplotlib.pyplot as plt
     plt.figure(figsize=(5,5))
     plt.imshow(cv2.cvtColor(images[0], cv2.COLOR_BGR2RGB))
@@ -27,7 +21,6 @@ def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_f
     plt.axis('off')
     plt.show()
     
-    # 2. Setup camera intrinsics: Estimate focal length as 1.5 * image width
     h, w = images[0].shape[:2]
     focal_length = 1.5 * w
     cx, cy = w / 2, h / 2
@@ -37,7 +30,6 @@ def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_f
     print("Camera intrinsic matrix K:")
     print(K)
     
-    # 3. Compute keypoints and descriptors for every image using ORB or SIFT
     if use_orb:
         detector = cv2.ORB_create(nfeatures=2000, scaleFactor=1.2, nlevels=8)
         print("Computing ORB features for each image...")
@@ -53,8 +45,7 @@ def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_f
         keypoints_list.append(kp)
         descriptors_list.append(des)
         print(f"Image {idx}: {len(kp)} keypoints")
-    
-    # 4. Setup matcher for feature matching
+
     if use_orb:
         matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
     else:
@@ -62,18 +53,16 @@ def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_f
         index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
         search_params = dict(checks=100)
         matcher = cv2.FlannBasedMatcher(index_params, search_params)
-    
-    # 5. Use known turntable poses from COIL-100
+
     global_R = []
     global_t = []
     for i in range(total_imgs):
         R, t = get_camera_pose(i, total_images=total_imgs, radius=1.0)
         global_R.append(R)
         global_t.append(t)
-    
-    # 6. Incrementally triangulate points from consecutive pairs
+
     sparse_points = []
-    used_frame_indices = [0]  # Start with the first image index
+    used_frame_indices = [0]
     current_idx = 0
     
     for i in range(1, total_imgs):
@@ -85,7 +74,6 @@ def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_f
             
             pts1 = []
             pts2 = []
-            # Perform matching with ratio test
             try:
                 matches = matcher.knnMatch(descriptors_list[prev_idx], descriptors_list[i], k=2)
                 good_matches = [m for m, n in matches if m.distance < 0.8 * n.distance]
@@ -103,7 +91,6 @@ def run_sfm_pipeline(coil_pattern, use_orb=True, interpolate_flag=True, filter_f
                 print(f"Not enough matches between frame {prev_idx} and {i}: {len(pts1)} points")
                 continue
             
-            # Estimate the Essential matrix and recover pose
             F, mask = cv2.findFundamentalMat(pts1, pts2, cv2.RANSAC, 3.0, 0.99)
             if F is None or F.shape != (3, 3):
                 print(f"Fundamental matrix estimation failed between frame {prev_idx} and {i}")
