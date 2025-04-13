@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sfm_pipeline import run_sfm_pipeline
 
-sample_img_path = "coil-100/coil-100/obj21__10.png"
+sample_img_path = "object21/obj21__10.png"
 sample_img = cv2.imread(sample_img_path)
 if sample_img is not None:
     plt.figure(figsize=(5, 5))
@@ -14,7 +14,7 @@ if sample_img is not None:
 else:
     print("Sample image not found!")
 
-coil_pattern = "coil-100/coil-100/obj21__*.png"
+coil_pattern = "object21/obj21__*.png"
 
 point_cloud, global_R, global_t, used_frame_indices = run_sfm_pipeline(
     coil_pattern,
