@@ -19,8 +19,8 @@ coil_pattern = "coil-100/coil-100/obj21__*.png"
 point_cloud, global_R, global_t, used_frame_indices = run_sfm_pipeline(
     coil_pattern,
     use_orb=True,
-    interpolate=True,
-    filter_outliers=True
+    interpolate_flag=True,
+    filter_flag=True
 )
 
 np.save("point_cloud.npy", point_cloud)
